@@ -33,17 +33,17 @@ public class GenerateManualRunnerMojo extends AbstractJasmineMojo {
 	}
 
 	private void writeSpecRunnerToSourceSpecDirectory() throws IOException {
-		SpecRunnerHtmlGenerator htmlGenerator = new SpecRunnerHtmlGenerator(jsSrcDir,jsTestSrcDir,preloadSources, sourceEncoding);
-		String runner = htmlGenerator.generate(ReporterType.TrivialReporter, customRunnerTemplate);
-		
-		File destination = new File(jasmineTargetDir,manualSpecRunnerHtmlFileName);
-		String existingRunner = loadExistingManualRunner(destination);
-		
-		if(!StringUtils.equals(runner, existingRunner)) {
-			FileUtils.writeStringToFile(destination, runner);
-		} else {
-			getLog().info("Skipping spec runner generation, because an identical spec runner already exists.");
-		}
+//		SpecRunnerHtmlGenerator htmlGenerator = new SpecRunnerHtmlGenerator(jsSrcDir,jsTestSrcDir,preloadSources, sourceEncoding);
+//		String runner = htmlGenerator.generate(ReporterType.TrivialReporter, customRunnerTemplate);
+//
+//		File destination = new File(jasmineTargetDir,manualSpecRunnerHtmlFileName);
+//		String existingRunner = loadExistingManualRunner(destination);
+//
+//		if(!StringUtils.equals(runner, existingRunner)) {
+//			FileUtils.writeStringToFile(destination, runner);
+//		} else {
+//			getLog().info("Skipping spec runner generation, because an identical spec runner already exists.");
+//		}
 	}
 
 	private String loadExistingManualRunner(File destination) {
