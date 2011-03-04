@@ -25,6 +25,7 @@ public class SpecRunnerHtmlGenerator {
     private static final String JAVASCRIPT_DEPENDENCIES_TEMPLATE_ATTR_NAME = "javascriptDependencies";
     private static final String SOURCES_TEMPLATE_ATTR_NAME = "sources";
     private static final String REPORTER_ATTR_NAME = "reporter";
+    private static final String PATH_VARIABLES = "pathVariables";
 
     //TODO - simplify this by finding all resources by folder instead
     public static final String JASMINE_JS = "/vendor/js/jasmine.js";
@@ -34,12 +35,17 @@ public class SpecRunnerHtmlGenerator {
     public static final String LOAD_SCRIPT = "/vendor/js/test-helper.js";
     public static final String JASMINE_CSS = "/vendor/css/jasmine.css";
 
+    public static final String JASMINE_PLUGIN_JS_NAMESPACE = "jasmine.plugin";
+    public static final String SPEC_DIR_JS_VARIABLE = JASMINE_PLUGIN_JS_NAMESPACE + ".jsTestDir";
+    public static final String SRC_DIR_JS_VARIABLE = JASMINE_PLUGIN_JS_NAMESPACE + ".jsSrcDir";
+
+
     private FileUtilsWrapper fileUtilsWrapper = new FileUtilsWrapper();
     private IOUtilsWrapper ioUtilsWrapper = new IOUtilsWrapper();
 
     private File sourceDir;
     private List<String> sourcesToLoadFirst;
-    private List<String> fileNamesAlreadyWrittenAsScriptTags = new ArrayList<String>();
+    private List<String> fileNamesAlreadyWrittenAsScriptTags = null;
     private String sourceEncoding;
     private File specDir;
 
@@ -52,12 +58,14 @@ public class SpecRunnerHtmlGenerator {
 
     public String generate(ReporterType reporterType, File customRunnerTemplate, String specName) {
         try {
+            fileNamesAlreadyWrittenAsScriptTags = new ArrayList<String>();
             String htmlTemplate = resolveHtmlTemplate(customRunnerTemplate);
             StringTemplate template = new StringTemplate(htmlTemplate, DefaultTemplateLexer.class);
 
             includeJavaScriptDependencies(asList(JASMINE_JS, JASMINE_HTML_JS, CONSOLE_X_JS, JSON_2_JS, LOAD_SCRIPT), template);
             includeCssDependencies(asList(JASMINE_CSS), template);
             setJavaScriptSourcesAttribute(template, specName);
+            template.setAttribute(PATH_VARIABLES, pathVariables());
             template.setAttribute(REPORTER_ATTR_NAME, reporterType.name());
             template.setAttribute(SOURCE_ENCODING, StringUtils.isNotBlank(sourceEncoding) ? sourceEncoding : DEFAULT_SOURCE_ENCODING);
 
@@ -65,6 +73,17 @@ public class SpecRunnerHtmlGenerator {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load file names for dependencies or scripts", e);
         }
+    }
+
+    private String pathVariables() {
+        return String.format(
+                "<script type='text/javascript'>\n" +
+                "%s = %s || {};\n" +
+                "%s = '%s';\n" +
+                "%s = '%s';\n" +
+                "</script>",
+                JASMINE_PLUGIN_JS_NAMESPACE, JASMINE_PLUGIN_JS_NAMESPACE, SPEC_DIR_JS_VARIABLE, JasminePluginFileUtils.fileToString(specDir), SRC_DIR_JS_VARIABLE, JasminePluginFileUtils.fileToString(sourceDir));
+
     }
 
     private String resolveHtmlTemplate(File customRunnerTemplate) throws IOException {
@@ -90,10 +109,11 @@ public class SpecRunnerHtmlGenerator {
     private void setJavaScriptSourcesAttribute(StringTemplate template, String specName) throws IOException {
         StringBuilder scriptTags = new StringBuilder();
         appendScriptTagsForFiles(scriptTags, expandSourcesToLoadFirstRelativeToSourceDir());
-//		appendScriptTagsForFiles(scriptTags, filesForScriptsInDirectory(sourceDir));
         appendScriptTagsForFiles(scriptTags, asList(specName));
         template.setAttribute(SOURCES_TEMPLATE_ATTR_NAME, scriptTags.toString());
     }
+
+
 
     private List<String> expandSourcesToLoadFirstRelativeToSourceDir() {
         List<String> files = new ArrayList<String>();
@@ -122,5 +142,4 @@ public class SpecRunnerHtmlGenerator {
             }
         }
     }
-
 }

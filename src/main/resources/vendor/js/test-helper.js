@@ -7,3 +7,12 @@ function loadScript(path) {
     script.src = path;
     head.appendChild(script);
 }
+
+function loadSource(fileName) {
+    loadScript(jasmine.plugin.jsSrcDir + fileName);
+}
+
+function loadSpec(fileName) {
+    loadScript(jasmine.plugin.jsTestDir + fileName);
+}
+

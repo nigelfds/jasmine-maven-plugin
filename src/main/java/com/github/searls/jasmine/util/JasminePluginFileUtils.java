@@ -12,11 +12,11 @@ import java.util.List;
 public class JasminePluginFileUtils {
     private static FileUtilsWrapper fileUtilsWrapper = new FileUtilsWrapper();
 
-    public static List<File> filesForScriptsInDirectory(File directory) throws IOException {
+    public static List<File> filesForScriptsInDirectory(File directory, String prefix) throws IOException {
         List<File> files = new ArrayList<File>();
         if (directory != null) {
             fileUtilsWrapper.forceMkdir(directory);
-            files = new ArrayList<File>(fileUtilsWrapper.listFiles(directory, new String[]{"js"}, true));
+            files = new ArrayList<File>(fileUtilsWrapper.listFiles(directory, new String[]{prefix}, true));
             Collections.sort(files);
         }
         return files;

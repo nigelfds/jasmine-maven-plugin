@@ -1,5 +1,5 @@
 var HelloWorld = function() {
 	this.greeting = function() {
-		return "Hello, World";
+		return "Hello, World " + test2;
 	}
 }

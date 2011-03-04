@@ -9,14 +9,15 @@
   </parent>
   <groupId>com.github.searls</groupId>
   <artifactId>jasmine-maven-plugin</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>jasmine-maven-plugin</name>
   <description>A JavaScript unit test plugin that processes JavaScript sources and Jasmine specs, prepares test runner
-    HTML files, executes Jasmine specs headlessly with HtmlUnit, and produces JUnit XML reports
+    HTML files, executes Jasmine specs headlessly with HtmlUnit, and produces JUnit XML reports. This is forked version
+    of Justin Searl's plugin - forked version runs each spec.js file in a separate runner to avoid collisions in tests.
   </description>
-  <url>https://github.com/searls/jasmine-maven-plugin</url>
+  <url>https://github.com/aeijae/jasmine-maven-plugin</url>
   <licenses>
     <license>
       <distribution>repo</distribution>
@@ -33,17 +34,27 @@
       <organization>Pillar Technology Group</organization>
       <organizationUrl>http://pillartechnology.com</organizationUrl>
     </developer>
+    <developer>
+      <id>maijanen</id>
+      <name>Matti Aijanen</name>
+      <email>matti@everholt.org</email>
+    </developer>
   </developers>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>jasmine-maven-plugin</id>
-      <url>http://nexus.ovimaps.devbln.europe.nokia.com:8081/nexus/content/repositories/jasmine-maven-plugin</url>
-    </snapshotRepository>
-    <repository>
-      <id>jasmine-maven-plugin-releases</id>
-      <url>http://nexus.ovimaps.devbln.europe.nokia.com:8081/nexus/content/repositories/jasmine-maven-plugin-releases</url>
-    </repository>
-  </distributionManagement>
+  <scm>
+    <url>https://github.com/aeijae/jasmine-maven-plugin</url>
+    <connection>scm:git:https://github.com/searls/jasmine-maven-plugin.git</connection>
+    <developerConnection>scm:git:https://searls@github.com/searls/jasmine-maven-plugin.git</developerConnection>
+  </scm>
+  <!--<distributionManagement>-->
+    <!--<snapshotRepository>-->
+      <!--<id>jasmine-maven-plugin-snapshots</id>-->
+      <!--<url>http://nexus.ovimaps.devbln.europe.nokia.com:8081/nexus/content/repositories/jasmine-maven-plugin-snapshots</url>-->
+    <!--</snapshotRepository>-->
+    <!--<repository>-->
+      <!--<id>jasmine-maven-plugin-releases</id>-->
+      <!--<url>http://nexus.ovimaps.devbln.europe.nokia.com:8081/nexus/content/repositories/jasmine-maven-plugin-releases</url>-->
+    <!--</repository>-->
+  <!--</distributionManagement>-->
   <properties>
     <jasmine.version>1.0.1</jasmine.version>
     <powermock.version>1.4.6</powermock.version>
@@ -165,6 +176,28 @@
             <goals>
               <goal>jar-no-fork</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generateManualRunner</goal>
+              <goal>resources</goal>
+              <goal>testResources</goal>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <preloadSources>
+                <source>https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js</source>
+
+              </preloadSources>
+              <jsSrcDir>${project.basedir}/src/main/resources/lib</jsSrcDir>
+            </configuration>
           </execution>
         </executions>
       </plugin>

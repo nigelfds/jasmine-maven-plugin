@@ -28,7 +28,7 @@ public class TestMojo extends AbstractJasmineMojo {
             File specsDir = new File(jasmineTargetDir,specDirectoryName);
             try {
                 getLog().info(JasmineResultLogger.HEADER);
-                for (File specFile : JasminePluginFileUtils.filesForScriptsInDirectory(specsDir)) {
+                for (File specFile : JasminePluginFileUtils.filesForScriptsInDirectory(specsDir, specFilePostfix)) {
                     getLog().info("Generating HTML page for spec " + specFile.getName());
                     JasmineResult result;
                     try {
@@ -44,13 +44,23 @@ public class TestMojo extends AbstractJasmineMojo {
                 }
             } catch (IOException e) {
                 throw new MojoFailureException("IO Exception: " + e.getMessage());
+            } catch (MojoFailureException mfe) {
+                throw mfe;
+            } finally {
+                logSummary();
             }
         } else {
 			getLog().info("Skipping Jasmine Tests");
 		}
 	}
 
-	private void logResults(JasmineResult result) {
+    private void logSummary() {
+        JasmineResultLogger resultLogger = new JasmineResultLogger();
+        resultLogger.setLog(getLog());
+        resultLogger.logSummary();
+    }
+
+    private void logResults(JasmineResult result) {
 		JasmineResultLogger resultLogger = new JasmineResultLogger();
 		resultLogger.setLog(getLog());
 		resultLogger.log(result);
@@ -60,7 +70,7 @@ public class TestMojo extends AbstractJasmineMojo {
 		SpecRunnerHtmlGenerator htmlGenerator = new SpecRunnerHtmlGenerator(new File(jasmineTargetDir,srcDirectoryName),new File(jasmineTargetDir,specDirectoryName),preloadSources, sourceEncoding);
 		String html = htmlGenerator.generate(ReporterType.JsApiReporter, customRunnerTemplate, JasminePluginFileUtils.fileToString(specFile));
 		getLog().debug("Writing out Spec Runner HTML " + html + " to directory " + jasmineTargetDir);
-		File runnerFile = new File(jasmineTargetDir, specFile.getName() + "-" + specRunnerHtmlFileName);
+		File runnerFile = createRunnerFile(specFile);
 		FileUtils.writeStringToFile(runnerFile, html);
 		return runnerFile;
 	}
